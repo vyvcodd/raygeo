@@ -12,14 +12,24 @@ class BidirScanOffsetSpec:
     r"""
     Parameters for the ``BidirScanOffset`` transformer.
     
-    Construct with ``BidirScanOffsetSpec(offset_mm)``. An offset of 0.0
-    is a legitimate no-op spec.
+    Construct with ``BidirScanOffsetSpec(offset_mm, scan_angle_deg=0.0)``.
+    An offset of 0.0 is a legitimate no-op spec. ``scan_angle_deg`` must
+    match the ``angle`` the raster was generated with (``raster()``'s
+    ``angle`` parameter) for the offset to apply along the correct
+    direction — it defaults to 0.0 (horizontal scanning).
     """
     @property
     def offset_mm(self) -> builtins.float:
         r"""
-        X offset in millimeters applied to right-to-left raster passes.
+        Offset in millimeters applied along the scan reference direction
+        to passes running opposite it.
+        """
+    @property
+    def scan_angle_deg(self) -> builtins.float:
+        r"""
+        The raster scan angle in degrees the offset is applied relative
+        to.
         """
     def __eq__(self, other: builtins.object, /) -> builtins.bool: ...
-    def __new__(cls, offset_mm: builtins.float) -> BidirScanOffsetSpec: ...
+    def __new__(cls, offset_mm: builtins.float, scan_angle_deg: builtins.float = 0.0) -> BidirScanOffsetSpec: ...
 

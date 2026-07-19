@@ -21,8 +21,8 @@ pub(crate) fn register(transform_mod: &Bound<'_, PyModule>) -> PyResult<()> {
 
 /// Parameters for the ``BidirScanOffset`` transformer.
 ///
-/// Construct with ``BidirScanOffsetSpec(offset_mm)``. An offset of 0.0
-/// is a legitimate no-op spec.
+/// ``scan_angle_deg`` must match the ``angle`` the raster was generated
+/// with (``raster()``'s ``angle``); defaults to 0.0 (horizontal).
 #[gen_stub_pyclass]
 #[pyclass(
     module = "raygeo.ops.transform.bidir_scan_offset",
@@ -33,9 +33,12 @@ pub(crate) fn register(transform_mod: &Bound<'_, PyModule>) -> PyResult<()> {
 )]
 #[derive(Clone, PartialEq)]
 pub struct BidirScanOffsetSpec {
-    /// X offset in millimeters applied to right-to-left raster passes.
+    /// Offset in mm applied along the scan direction to opposing passes.
     #[pyo3(get)]
     pub offset_mm: f64,
+    /// Scan angle in degrees the offset is applied relative to.
+    #[pyo3(get)]
+    pub scan_angle_deg: f64,
 }
 
 impl BidirScanOffsetSpec {
@@ -43,6 +46,7 @@ impl BidirScanOffsetSpec {
     pub fn into_core(self) -> CoreBidirScanOffsetSpec {
         CoreBidirScanOffsetSpec {
             offset_mm: self.offset_mm,
+            scan_angle_deg: self.scan_angle_deg,
         }
     }
 }
@@ -51,7 +55,11 @@ impl BidirScanOffsetSpec {
 #[pymethods]
 impl BidirScanOffsetSpec {
     #[new]
-    fn new(offset_mm: f64) -> Self {
-        Self { offset_mm }
+    #[pyo3(signature = (offset_mm, scan_angle_deg = 0.0))]
+    fn new(offset_mm: f64, scan_angle_deg: f64) -> Self {
+        Self {
+            offset_mm,
+            scan_angle_deg,
+        }
     }
 }

@@ -3044,20 +3044,26 @@ impl PyOps {
         );
     }
 
-    /// Correct X misalignment between left-to-right and right-to-left
-    /// raster passes.
+    /// Correct positional misalignment between alternating raster
+    /// passes running in opposite directions.
     ///
-    /// For every raster pass (a ``MoveTo`` followed by a ``ScanLine``),
-    /// if the pass runs right-to-left, both the entry ``MoveTo`` and
-    /// the ``ScanLine`` endpoint are shifted along X by ``offset_mm``.
-    /// Left-to-right passes are left untouched.
+    /// Passes running opposite the scan reference direction (derived
+    /// from ``scan_angle_deg``, same convention as ``raster()``'s
+    /// ``angle``) are shifted along that direction by ``offset_mm``;
+    /// passes running with it are untouched. At the default
+    /// ``scan_angle_deg=0.0`` this matches shifting right-to-left
+    /// passes along X.
     ///
-    /// :param offset_mm: Offset in millimeters to apply to RTL passes.
+    /// :param offset_mm: Offset in millimeters for passes running
+    ///     opposite the scan reference direction.
+    /// :param scan_angle_deg: Scan angle in degrees. Default 0.0.
     /// :complexity: O(n) time, O(n) space
-    fn apply_bidir_scan_offset(&mut self, offset_mm: f64) {
+    #[pyo3(signature = (offset_mm, scan_angle_deg = 0.0))]
+    fn apply_bidir_scan_offset(&mut self, offset_mm: f64, scan_angle_deg: f64) {
         crate::ops::transform::bidir_scan_offset::apply_bidir_scan_offset(
             &mut self.inner,
             offset_mm,
+            scan_angle_deg,
         );
     }
 

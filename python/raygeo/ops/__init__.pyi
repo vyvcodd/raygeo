@@ -1393,17 +1393,27 @@ class Ops:
         :param distance_mm: Overscan distance in millimeters.
         :complexity: O(n) time, O(n) space
         """
-    def apply_bidir_scan_offset(self, offset_mm: builtins.float) -> None:
+    def apply_bidir_scan_offset(self, offset_mm: builtins.float, scan_angle_deg: builtins.float = 0.0) -> None:
         r"""
-        Correct X misalignment between left-to-right and right-to-left
-        raster passes.
+        Correct positional misalignment between alternating raster
+        passes running in opposite directions.
         
         For every raster pass (a ``MoveTo`` followed by a ``ScanLine``),
-        if the pass runs right-to-left, both the entry ``MoveTo`` and
-        the ``ScanLine`` endpoint are shifted along X by ``offset_mm``.
-        Left-to-right passes are left untouched.
+        classify its direction against the scan reference direction
+        derived from ``scan_angle_deg`` (same convention as ``raster()``'s
+        ``angle`` parameter). If the pass runs opposite that reference
+        direction, both the entry ``MoveTo`` and the ``ScanLine`` endpoint
+        are shifted along the reference direction by ``offset_mm``. Passes
+        running along the reference direction are left untouched.
         
-        :param offset_mm: Offset in millimeters to apply to RTL passes.
+        ``scan_angle_deg`` must match the angle the raster was actually
+        generated with. At the default of 0.0 (horizontal scanning) this
+        is equivalent to shifting right-to-left passes along X.
+        
+        :param offset_mm: Offset in millimeters to apply to passes running
+            opposite the scan reference direction.
+        :param scan_angle_deg: The raster scan angle in degrees the
+            offset should be applied relative to. Default 0.0.
         :complexity: O(n) time, O(n) space
         """
     def apply_multipass(self, passes: builtins.int, z_step_down: builtins.float) -> None:
